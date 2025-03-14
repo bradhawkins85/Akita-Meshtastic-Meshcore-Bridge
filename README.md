@@ -1,4 +1,4 @@
-# Akita Meshtastic-Meshcore Bridge (ammb.py)
+# Akita Meshtastic-Meshcore Bridge
 
 This project provides a bridge between Meshtastic and Meshcore networks, enabling seamless communication between the two.
 
