@@ -1,0 +1,13 @@
+# requirements-dev.txt
+# Development and testing dependencies
+
+# Include runtime requirements
+-r requirements.txt
+
+# Testing framework
+pytest>=7.0.0,<8.0.0
+pytest-cov>=4.0.0,<5.0.0 # For coverage reporting
+
+# Linting and static analysis (optional but recommended)
+flake8>=6.0.0,<7.0.0
+mypy>=1.0.0,<2.0.0
