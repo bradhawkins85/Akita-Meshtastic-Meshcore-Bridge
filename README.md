@@ -73,10 +73,9 @@ For a more detailed explanation of the data flow and components, see the [Archit
 1.  **Clone the Repository:**
     Open your terminal or command prompt and run:
     ```bash
-    git clone [https://github.com/YOUR_USERNAME/akita-meshtastic-meshcore-bridge.git](https://github.com/YOUR_USERNAME/akita-meshtastic-meshcore-bridge.git)
+    git clone [https://github.com/akitaengineering/akita-meshtastic-meshcore-bridge.git](https://github.com/akitaengineering/akita-meshtastic-meshcore-bridge.git)
     cd akita-meshtastic-meshcore-bridge
     ```
-    (Replace `YOUR_USERNAME` with the actual repository location if forked).
 
 2.  **Set up a Python Virtual Environment (Highly Recommended):**
     This isolates the project's dependencies from your system's Python installation.
