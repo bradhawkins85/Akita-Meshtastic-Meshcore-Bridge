@@ -3,7 +3,7 @@
 # Akita Meshtastic-Meshcore Bridge (AMMB)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-**AMMB is a flexible and robust software bridge designed to facilitate seamless, bidirectional communication between [Meshtastic](https://meshtastic.org/) LoRa mesh networks and serial-connected MeshCore (like [`ripplebiz/MeshCore`](https://github.com/ripplebiz/MeshCore)) radio networks.**
+**AMMB is a flexible and robust software bridge designed to facilitate seamless, bidirectional communication between LoRa mesh networks [Meshtastic](https://meshtastic.org/)  and MeshCore (like [`ripplebiz/MeshCore`](https://github.com/ripplebiz/MeshCore)) radio networks.**
 
 This bridge enables interoperability, allowing messages, sensor data (with appropriate translation), and potentially other information to flow between these two distinct low-power, long-range communication systems.
 
