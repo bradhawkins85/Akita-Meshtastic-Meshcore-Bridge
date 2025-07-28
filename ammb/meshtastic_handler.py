@@ -11,7 +11,7 @@ Handles all interactions with the Meshtastic device and network.
 import logging
 import threading
 import time
-from queue import Queue, Empty
+from queue import Queue, Empty, Full
 from typing import Optional, Dict, Any
 
 # External dependencies
@@ -61,12 +61,12 @@ class MeshtasticHandler:
 
             try:
                 self.logger.info(
-                    f"Attempting TCP connection to Meshtastic at {self.config.meshtastic_host}:{self.config.meshtastic_port}..."
+                    f"Attempting TCP connection to Meshtastic at {self.config.meshtastic_tcp_host}:{self.config.meshtastic_tcp_port}..."
                 )
                 # Explicitly pass noProto=False if needed, though default should be fine
                 self.interface = meshtastic.tcp_interface.TCPInterface(
-                    self.config.meshtastic_host,
-                    portNumber=self.config.meshtastic_port,
+                    self.config.meshtastic_tcp_host,
+                    portNumber=self.config.meshtastic_tcp_port,
                     # debugOut=sys.stdout # Optional: for deep debugging
                 )
 
@@ -91,9 +91,12 @@ class MeshtasticHandler:
                 self.logger.info("Meshtastic receive callback registered.")
                 return True
 
-            except (serial.SerialException, meshtastic.MeshtasticError, ImportError, Exception) as e:
-                self.logger.error(f"Error connecting to Meshtastic device: {e}", exc_info=False) # Keep log cleaner
-                self.interface = None # Ensure interface is None on failure
+            except Exception as e:
+                self.logger.error(
+                    f"Error connecting to Meshtastic device: {e}",
+                    exc_info=False,
+                )  # Keep log cleaner
+                self.interface = None  # Ensure interface is None on failure
                 self.my_node_id = None
                 return False
 
@@ -225,7 +228,7 @@ class MeshtasticHandler:
                     # Put the structured message onto the queue for the Meshcore sender
                     self.to_meshcore_queue.put_nowait(meshcore_message)
                     self.logger.debug(f"Queued message from {sender_id_hex} (Port: {portnum}) for Meshcore.")
-                except Queue.Full:
+                except Full:
                     self.logger.warning("Meshcore send queue is full. Dropping incoming Meshtastic message.")
 
         except Exception as e:
@@ -272,12 +275,11 @@ class MeshtasticHandler:
                             )
                             # TODO: Handle potential ACK failures if wantAck=True
                             self.to_meshtastic_queue.task_done() # Mark message as processed
-                        except meshtastic.MeshtasticError as e:
-                             self.logger.error(f"Meshtastic library error sending message: {e}")
-                             # Decide if retry is needed or discard
-                             self.to_meshtastic_queue.task_done()
                         except Exception as e:
-                            self.logger.error(f"Unexpected error sending Meshtastic message: {e}", exc_info=True)
+                            self.logger.error(
+                                f"Error sending Meshtastic message: {e}",
+                                exc_info=True,
+                            )
                             # Decide if retry is needed or discard
                             self.to_meshtastic_queue.task_done()
                     else:
