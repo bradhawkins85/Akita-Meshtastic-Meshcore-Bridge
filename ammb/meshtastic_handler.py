@@ -16,7 +16,7 @@ from typing import Optional, Dict, Any
 
 # External dependencies
 import meshtastic
-import meshtastic.serial_interface
+import meshtastic.tcp_interface
 from pubsub import pub
 import serial # For specific exceptions like SerialException
 
@@ -42,7 +42,7 @@ class MeshtasticHandler:
         self.to_meshtastic_queue = from_meshcore_queue # Rename for clarity within this class
         self.shutdown_event = shutdown_event
 
-        self.interface: Optional[meshtastic.serial_interface.SerialInterface] = None
+        self.interface: Optional[meshtastic.tcp_interface.TCPInterface] = None
         self.my_node_id: Optional[str] = None # Actual node ID from device
         self.sender_thread: Optional[threading.Thread] = None
         self._lock = threading.Lock() # Protect access to self.interface during reconnect
@@ -60,10 +60,13 @@ class MeshtasticHandler:
                 return True # Or False depending on desired behavior
 
             try:
-                self.logger.info(f"Attempting connection to Meshtastic on {self.config.meshtastic_port}...")
+                self.logger.info(
+                    f"Attempting TCP connection to Meshtastic at {self.config.meshtastic_host}:{self.config.meshtastic_port}..."
+                )
                 # Explicitly pass noProto=False if needed, though default should be fine
-                self.interface = meshtastic.serial_interface.SerialInterface(
-                    self.config.meshtastic_port,
+                self.interface = meshtastic.tcp_interface.TCPInterface(
+                    self.config.meshtastic_host,
+                    portNumber=self.config.meshtastic_port,
                     # debugOut=sys.stdout # Optional: for deep debugging
                 )
 

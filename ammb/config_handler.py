@@ -69,8 +69,10 @@ def load_config(config_path: str = CONFIG_FILE) -> Optional[BridgeConfig]:
         config.read(config_path)
 
         # Use the [DEFAULT] section for all settings
-        if 'DEFAULT' not in config:
-             logger.error(f"Configuration file '{config_path}' is missing the required [DEFAULT] section.")
+        if 'DEFAULT' not in config or not config['DEFAULT']:
+             logger.error(
+                 f"Configuration file '{config_path}' is missing the required [DEFAULT] section."
+             )
              return None
         cfg_section = config['DEFAULT']
 
