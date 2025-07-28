@@ -31,7 +31,7 @@ try:
     import serial
     from pubsub import pub
     import meshtastic
-    import meshtastic.serial_interface # Explicitly check submodule too
+    import meshtastic.tcp_interface  # Explicitly check submodule too
 except ImportError as e:
     # Use basic print/logging as full logging isn't set up yet
     print(f"ERROR: Missing required library - {e.name}", file=sys.stderr)
