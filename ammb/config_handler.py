@@ -12,6 +12,8 @@ from typing import NamedTuple, Optional
 class BridgeConfig(NamedTuple):
     """Stores all configuration settings for the bridge."""
     meshtastic_port: str
+    meshtastic_tcp_host: str
+    meshtastic_tcp_port: int
     meshcore_port: str
     meshcore_baud: int
     meshcore_protocol: str
@@ -27,6 +29,8 @@ CONFIG_FILE = "config.ini" # Default config filename
 DEFAULT_CONFIG = {
     'MESHTASTIC_SERIAL_PORT': '/dev/ttyUSB0', # Example for Linux
     # 'MESHTASTIC_SERIAL_PORT': 'COM3',      # Example for Windows
+    'MESHTASTIC_TCP_HOST': '127.0.0.1',       # Default host for TCP connection
+    'MESHTASTIC_TCP_PORT': '4403',            # Default port for TCP connection
     'MESHCORE_SERIAL_PORT': '/dev/ttyS0',    # Example for Linux
     # 'MESHCORE_SERIAL_PORT': 'COM4',        # Example for Windows
     'MESHCORE_BAUD_RATE': '9600',            # Common baud rate, adjust as needed
@@ -69,10 +73,8 @@ def load_config(config_path: str = CONFIG_FILE) -> Optional[BridgeConfig]:
         config.read(config_path)
 
         # Use the [DEFAULT] section for all settings
-        if 'DEFAULT' not in config or not config['DEFAULT']:
-             logger.error(
-                 f"Configuration file '{config_path}' is missing the required [DEFAULT] section."
-             )
+        if not config.defaults():
+             logger.error(f"Configuration file '{config_path}' is missing the required [DEFAULT] section.")
              return None
         cfg_section = config['DEFAULT']
 
@@ -82,6 +84,8 @@ def load_config(config_path: str = CONFIG_FILE) -> Optional[BridgeConfig]:
             return cfg_section.get(key, DEFAULT_CONFIG[key])
 
         meshtastic_port = get_setting('MESHTASTIC_SERIAL_PORT')
+        meshtastic_tcp_host = get_setting('MESHTASTIC_TCP_HOST')
+        meshtastic_tcp_port_str = get_setting('MESHTASTIC_TCP_PORT')
         meshcore_port = get_setting('MESHCORE_SERIAL_PORT')
         meshcore_network_id = get_setting('MESHCORE_NETWORK_ID')
         bridge_node_id = get_setting('BRIDGE_NODE_ID')
@@ -90,6 +94,9 @@ def load_config(config_path: str = CONFIG_FILE) -> Optional[BridgeConfig]:
         try:
             meshcore_baud = int(get_setting('MESHCORE_BAUD_RATE'))
             queue_size = int(get_setting('MESSAGE_QUEUE_SIZE'))
+            meshtastic_tcp_port = int(meshtastic_tcp_port_str)
+            if meshtastic_tcp_port <= 0 or meshtastic_tcp_port > 65535:
+                raise ValueError('MESHTASTIC_TCP_PORT must be between 1 and 65535')
             if meshcore_baud <= 0 or queue_size <= 0:
                  raise ValueError("Baud rate and queue size must be positive integers.")
         except ValueError as e:
@@ -118,6 +125,8 @@ def load_config(config_path: str = CONFIG_FILE) -> Optional[BridgeConfig]:
         # --- Create and Return Config Object ---
         bridge_config = BridgeConfig(
             meshtastic_port=meshtastic_port,
+            meshtastic_tcp_host=meshtastic_tcp_host,
+            meshtastic_tcp_port=meshtastic_tcp_port,
             meshcore_port=meshcore_port,
             meshcore_baud=meshcore_baud,
             meshcore_protocol=meshcore_protocol,
