@@ -17,6 +17,8 @@ def test_load_config_success(temp_config_file):
     assert isinstance(config, BridgeConfig)
     # Check if values match the ones written in the fixture
     assert config.meshtastic_port == '/dev/test_meshtastic'
+    assert config.meshtastic_tcp_host == 'localhost'
+    assert config.meshtastic_tcp_port == 4403
     assert config.meshcore_port == '/dev/test_meshcore'
     assert config.meshcore_baud == 19200
     assert config.meshcore_protocol == 'json_newline'
@@ -78,6 +80,8 @@ def test_load_config_uses_defaults(tmp_path):
     assert config.meshtastic_port == '/dev/partial_meshtastic' # Overridden
     assert config.log_level == 'WARNING' # Overridden
     # Check a default value
+    assert config.meshtastic_tcp_host == DEFAULT_CONFIG['MESHTASTIC_TCP_HOST']
+    assert config.meshtastic_tcp_port == int(DEFAULT_CONFIG['MESHTASTIC_TCP_PORT'])
     assert config.meshcore_port == DEFAULT_CONFIG['MESHCORE_SERIAL_PORT']
     assert config.meshcore_baud == int(DEFAULT_CONFIG['MESHCORE_BAUD_RATE'])
     assert config.meshcore_protocol == DEFAULT_CONFIG['MESHCORE_PROTOCOL']
