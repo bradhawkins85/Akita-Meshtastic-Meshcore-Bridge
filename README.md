@@ -7,6 +7,8 @@
 
 This bridge enables interoperability, allowing messages, sensor data (with appropriate translation), and potentially other information to flow between these two distinct low-power, long-range communication systems.
 
+**This bridge has been modified to use on FemtoFox devices and is still in development** we cannot guarantee it works just yet.
+
 ---
 
 ## Table of Contents
@@ -29,7 +31,7 @@ This bridge enables interoperability, allowing messages, sensor data (with appro
 
 * **Bidirectional Message Forwarding:** Relays messages originating from Meshtastic nodes to the connected MeshCore network, and vice-versa.
 * **Direct Serial MeshCore Connection:** Interfaces directly with MeshCore nodes via standard RS-232/USB serial ports, avoiding the need for intermediate network gateways in the base case.
-* **Reliable Meshtastic Integration:** Leverages the official `meshtastic-python` library, utilizing its asynchronous callback mechanism (`pubsub`) for efficient message reception.
+* **~~Reliable~~ Meshtastic Integration:** Leverages the official `meshtastic-python` library, utilizing its asynchronous callback mechanism (`pubsub`) for efficient message reception.
 * **Modular & Extensible Design:** Built with separate handlers for each network type (`MeshtasticHandler`, `MeshcoreHandler`) and protocol (`protocol.py`), making it easier to understand, maintain, and extend.
 * **Configurable Meshcore Protocol:** Supports different serial communication protocols for MeshCore via the `config.ini` file. Includes a default handler for newline-terminated JSON (`json_newline`), which can be adapted or replaced.
 * **Robust Connection Management:** Automatically attempts to reconnect to Meshtastic and MeshCore devices if the serial connection is lost during operation.
