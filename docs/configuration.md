@@ -17,6 +17,16 @@ All settings are currently placed under the `[DEFAULT]` section.
         * Check your operating system's device manager or `/dev` directory.
     * **Required:** Yes
 
+* **`MESHTASTIC_TCP_HOST`**
+    * **Description:** Hostname or IP address for connecting to a Meshtastic daemon over TCP.
+    * **Default:** `127.0.0.1`
+    * **Required:** No
+
+* **`MESHTASTIC_TCP_PORT`**
+    * **Description:** TCP port for the Meshtastic daemon connection.
+    * **Default:** `4403`
+    * **Required:** No
+
 ### Meshcore Settings
 
 * **`MESHCORE_SERIAL_PORT`**
