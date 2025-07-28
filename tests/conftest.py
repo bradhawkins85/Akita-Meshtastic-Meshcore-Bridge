@@ -16,7 +16,7 @@ def temp_config_file(tmp_path) -> Generator[str, None, None]:
     parser = configparser.ConfigParser()
     parser['DEFAULT'] = {
         'MESHTASTIC_SERIAL_PORT': '/dev/test_meshtastic',
-        'MESHTASTIC_TCP_HOST': '192.168.1.1',
+        'MESHTASTIC_TCP_HOST': 'localhost',
         'MESHTASTIC_TCP_PORT': '4403',
         'MESHCORE_SERIAL_PORT': '/dev/test_meshcore',
         'MESHCORE_BAUD_RATE': '19200',

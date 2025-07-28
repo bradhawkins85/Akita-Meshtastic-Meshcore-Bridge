@@ -73,6 +73,7 @@ def load_config(config_path: str = CONFIG_FILE) -> Optional[BridgeConfig]:
         config.read(config_path)
 
         # Use the [DEFAULT] section for all settings
+
         if not config.defaults():
              logger.error(f"Configuration file '{config_path}' is missing the required [DEFAULT] section.")
              return None
@@ -83,9 +84,14 @@ def load_config(config_path: str = CONFIG_FILE) -> Optional[BridgeConfig]:
         def get_setting(key: str) -> str:
             return cfg_section.get(key, DEFAULT_CONFIG[key])
 
-        meshtastic_port = get_setting('MESHTASTIC_SERIAL_PORT')
         meshtastic_tcp_host = get_setting('MESHTASTIC_TCP_HOST')
-        meshtastic_tcp_port_str = get_setting('MESHTASTIC_TCP_PORT')
+        try:
+            meshtastic_tcp_port = int(get_setting('MESHTASTIC_TCP_PORT'))
+            if meshtastic_tcp_port <= 0:
+                raise ValueError("TCP port must be a positive integer.")
+        except ValueError as e:
+            logger.error(f"Invalid MESHTASTIC_TCP_PORT: {e}")
+            return None
         meshcore_port = get_setting('MESHCORE_SERIAL_PORT')
         meshcore_network_id = get_setting('MESHCORE_NETWORK_ID')
         bridge_node_id = get_setting('BRIDGE_NODE_ID')
