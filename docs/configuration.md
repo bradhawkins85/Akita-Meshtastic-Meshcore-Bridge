@@ -8,13 +8,10 @@ All settings are currently placed under the `[DEFAULT]` section.
 
 ### Meshtastic Settings
 
-* **`MESHTASTIC_SERIAL_PORT`**
-    * **Description:** The serial port where your Meshtastic device is connected.
-    * **Example Linux:** `/dev/ttyUSB0`, `/dev/ttyACM0`
-    * **Example Windows:** `COM3`, `COM4`
-    * **Finding the port:**
-        * Use the command `meshtastic --port list`.
-        * Check your operating system's device manager or `/dev` directory.
+* **`MESHTASTIC_TCP_ADDRESS`**
+    * **Description:** Host and port for the Meshtastic TCP service to which the bridge should connect.
+    * **Example:** `localhost:4403`, `meshtastic.local:4403`
+    * **Finding the address:** Ensure the Meshtastic device is running a TCP interface (e.g., via `meshtasticd`) and note its listening address.
     * **Required:** Yes
 
 ### Meshcore Settings
