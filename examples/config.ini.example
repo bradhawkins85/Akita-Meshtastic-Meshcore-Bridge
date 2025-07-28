@@ -12,6 +12,12 @@
 # Example Windows: COM3
 MESHTASTIC_SERIAL_PORT = /dev/ttyUSB0
 
+# Host and port for TCP connection to Meshtastic (optional).
+# Used if connecting over TCP instead of serial.
+# Host is typically the IP address of the device running meshtasticd.
+MESHTASTIC_TCP_HOST = 127.0.0.1
+MESHTASTIC_TCP_PORT = 4403
+
 
 # --- Meshcore Settings ---
 

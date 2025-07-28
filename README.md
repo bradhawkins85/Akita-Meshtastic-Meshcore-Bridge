@@ -108,7 +108,6 @@ The bridge requires a `config.ini` file in the project's root directory.
 
 2.  **Edit `config.ini`:**
     Open the newly created `config.ini` file in a text editor and adjust the settings according to your hardware setup:
-    * `MESHTASTIC_TCP_ADDRESS`: Specify the host and port for your Meshtastic device's TCP interface (e.g., `localhost:4403`). Ensure the Meshtastic service is running and reachable.
     * `MESHCORE_SERIAL_PORT`: Set the correct serial port for your MeshCore device (e.g., `/dev/ttyS0`, `COM4`).
     * `MESHCORE_BAUD_RATE`: **Crucially, set this to match the baud rate configured on your MeshCore device.** (e.g., `9600`, `115200`).
     * `MESHCORE_PROTOCOL`: Select the protocol handler matching how your MeshCore device communicates. `json_newline` is the default. See `docs/architecture.md` for the expected JSON structure if using the default.
