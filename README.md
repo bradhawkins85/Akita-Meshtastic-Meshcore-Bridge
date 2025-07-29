@@ -112,7 +112,7 @@ The bridge requires a `config.ini` file in the project's root directory.
     Open the newly created `config.ini` file in a text editor and adjust the settings according to your hardware setup:
     * `MESHCORE_SERIAL_PORT`: Set the correct serial port for your MeshCore device (e.g., `/dev/ttyS0`, `COM4`).
     * `MESHCORE_BAUD_RATE`: **Crucially, set this to match the baud rate configured on your MeshCore device.** (e.g., `9600`, `115200`).
-    * `MESHCORE_PROTOCOL`: Select the protocol handler matching how your MeshCore device communicates. `json_newline` is the default. See `docs/architecture.md` for the expected JSON structure if using the default.
+    * `MESHCORE_PROTOCOL`: Select the protocol handler matching how your MeshCore device communicates. `json_newline` is the default. Set to `companion_frame` for the binary companion-radio frames defined in the MeshCore wiki.
     * `BRIDGE_NODE_ID`: **Recommended:** Set this to the actual Meshtastic Node ID (e.g., `!a1b2c3d4`) of the device running the bridge to prevent message loops. Use `meshtastic --info` to find your ID.
     * `LOG_LEVEL`: Adjust logging verbosity (`DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`). `INFO` is a good starting point.
 

@@ -7,7 +7,12 @@ import pytest
 import json
 
 # Module to test
-from ammb.protocol import get_protocol_handler, JsonNewlineProtocol, MeshcoreProtocolHandler
+from ammb.protocol import (
+    get_protocol_handler,
+    JsonNewlineProtocol,
+    MeshcoreProtocolHandler,
+    CompanionFrameProtocol,
+)
 
 # --- Test JsonNewlineProtocol ---
 
@@ -15,6 +20,12 @@ from ammb.protocol import get_protocol_handler, JsonNewlineProtocol, MeshcorePro
 def json_handler() -> JsonNewlineProtocol:
     """Provides an instance of the JsonNewlineProtocol handler."""
     return JsonNewlineProtocol()
+
+
+@pytest.fixture
+def frame_handler() -> CompanionFrameProtocol:
+    """Provides an instance of the CompanionFrameProtocol handler."""
+    return CompanionFrameProtocol()
 
 # Parameterize test data for encoding
 encode_test_data = [
@@ -74,6 +85,30 @@ def test_get_protocol_handler_success():
     # Test case insensitivity
     handler_upper = get_protocol_handler('JSON_NEWLINE')
     assert isinstance(handler_upper, JsonNewlineProtocol)
+
+    frame = get_protocol_handler('companion_frame')
+    assert isinstance(frame, CompanionFrameProtocol)
+
+
+def test_companion_frame_decode(frame_handler: CompanionFrameProtocol):
+    """Decode a simple Companion Radio text frame."""
+    payload = bytes([
+        7,  # RESP_CODE_CONTACT_MSG_RECV
+        1, 2, 3, 4, 5, 6,  # pubkey prefix
+        0xFF,  # path_len
+        0,      # txt_type
+    ]) + (0x12345678).to_bytes(4, "little") + b"hello"
+    frame = b'>' + len(payload).to_bytes(2, "little") + payload
+    result = frame_handler.decode(frame)
+    assert result == {
+        "direction": "outbound",
+        "code": 7,
+        "pubkey_prefix": "010203040506",
+        "path_len": 0xFF,
+        "txt_type": 0,
+        "sender_timestamp": 0x12345678,
+        "text": "hello",
+    }
 
 def test_get_protocol_handler_unsupported():
     """Test getting an unknown protocol handler raises ValueError."""

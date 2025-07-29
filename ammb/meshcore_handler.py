@@ -182,10 +182,26 @@ class MeshcoreHandler:
                 # Read one line (or up to timeout) from the serial port
                 # This assumes a line-based protocol (like json_newline)
                 # For other protocols, reading logic might need adjustment (e.g., read fixed bytes)
-                with self._lock: # Ensure port isn't closed by another thread during read
-                     if not self.serial_port or not self.serial_port.is_open:
-                          continue # Port closed between check and read, loop again
-                     line: Optional[bytes] = self.serial_port.readline()
+                with self._lock:  # Ensure port isn't closed by another thread during read
+                    if not self.serial_port or not self.serial_port.is_open:
+                        continue  # Port closed between check and read, loop again
+                    if self.config.meshcore_protocol == 'json_newline':
+                        line: Optional[bytes] = self.serial_port.readline()
+                    else:
+                        header = self.serial_port.read(3)
+                        if not header or len(header) < 3:
+                            continue
+                        start = header[0]
+                        if start not in (0x3E, 0x3C):
+                            continue
+                        length = int.from_bytes(header[1:3], 'little')
+                        payload = self.serial_port.read(length)
+                        if len(payload) < length:
+                            self.logger.warning(
+                                f"Incomplete frame: expected {length} bytes, got {len(payload)}"
+                            )
+                            continue
+                        line = header + payload
 
                 if line:
                     self.logger.debug(f"Meshcore RAW RX: {line!r}")
@@ -231,7 +247,18 @@ class MeshcoreHandler:
                             except Queue.Full:
                                 self.logger.warning("Meshtastic send queue is full. Dropping incoming message from Meshcore.")
                         else:
-                            self.logger.warning(f"Meshcore RX: Decoded message lacks required fields ('destination_meshtastic_id' or 'payload'/'payload_json'): {meshcore_msg}")
+                            if self.config.meshcore_protocol == 'companion_frame':
+                                # Frames like status updates or acknowledgements
+                                # are not forwarded to Meshtastic. Log at debug
+                                # level instead of warning.
+                                self.logger.debug(
+                                    f"Meshcore RX: Ignoring non-forwardable frame: {meshcore_msg}"
+                                )
+                            else:
+                                self.logger.warning(
+                                    "Meshcore RX: Decoded message lacks required fields ('destination_meshtastic_id' or 'payload'/'payload_json'): %s",
+                                    meshcore_msg,
+                                )
                     # else: message was decoded as None (e.g., empty line, parse error) - already logged by decoder
 
                 # else: readline timed out (no data received), this is normal
