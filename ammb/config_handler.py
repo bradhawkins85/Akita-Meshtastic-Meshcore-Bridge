@@ -43,7 +43,7 @@ DEFAULT_CONFIG = {
 
 # Valid options for settings requiring specific choices
 VALID_LOG_LEVELS = {'CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'}
-VALID_MESHCORE_PROTOCOLS = {'json_newline'} # Add more as they are implemented
+VALID_MESHCORE_PROTOCOLS = {'json_newline', 'companion_frame'}
 
 # --- Functions ---
 def load_config(config_path: str = CONFIG_FILE) -> Optional[BridgeConfig]:
