@@ -104,13 +104,69 @@ class JsonNewlineProtocol(MeshcoreProtocolHandler):
             self.logger.error(f"Error decoding Meshcore data: {e} - Raw line: {line!r}", exc_info=True)
             return None
 
+class CompanionFrameProtocol(MeshcoreProtocolHandler):
+    """Handle binary frames used by the MeshCore companion radio."""
+
+    def encode(self, data: Dict[str, Any]) -> Optional[bytes]:
+        self.logger.error("Encoding not implemented for CompanionFrameProtocol")
+        return None
+
+    def decode(self, frame: bytes) -> Optional[Dict[str, Any]]:
+        if not frame or len(frame) < 4:
+            return None
+
+        start = frame[0]
+        if start not in (0x3E, 0x3C):
+            self.logger.warning(f"Invalid frame start byte: {start:#x}")
+            return None
+
+        length = int.from_bytes(frame[1:3], "little")
+        payload = frame[3:3 + length]
+
+        if len(payload) < length:
+            self.logger.warning(
+                f"Incomplete frame: expected {length} bytes payload, got {len(payload)}"
+            )
+            return None
+
+        msg: Dict[str, Any] = {
+            "direction": "outbound" if start == 0x3E else "inbound",
+            "code": payload[0],
+        }
+
+        code = payload[0]
+
+        try:
+            if code == 7 and length >= 13:
+                msg.update({
+                    "pubkey_prefix": payload[1:7].hex(),
+                    "path_len": payload[7],
+                    "txt_type": payload[8],
+                    "sender_timestamp": int.from_bytes(payload[9:13], "little"),
+                    "text": payload[13:length].decode("utf-8", errors="ignore"),
+                })
+            elif code == 8 and length >= 9:
+                msg.update({
+                    "channel_idx": payload[1],
+                    "path_len": payload[2],
+                    "txt_type": payload[3],
+                    "sender_timestamp": int.from_bytes(payload[4:8], "little"),
+                    "text": payload[8:length].decode("utf-8", errors="ignore"),
+                })
+            else:
+                msg["payload"] = payload[1:length].hex()
+        except Exception as exc:  # pragma: no cover - defensive
+            self.logger.error(f"Failed to decode Companion frame: {exc}", exc_info=True)
+            return None
+
+        return msg
+
 # --- Factory Function ---
 
 # Store registered protocol handlers
 _protocol_handlers = {
     'json_newline': JsonNewlineProtocol,
-    # Add other protocol handlers here as they are created
-    # 'plain_text': PlainTextProtocol,
+    'companion_frame': CompanionFrameProtocol,
 }
 
 def get_protocol_handler(protocol_name: str) -> MeshcoreProtocolHandler:

@@ -182,10 +182,26 @@ class MeshcoreHandler:
                 # Read one line (or up to timeout) from the serial port
                 # This assumes a line-based protocol (like json_newline)
                 # For other protocols, reading logic might need adjustment (e.g., read fixed bytes)
-                with self._lock: # Ensure port isn't closed by another thread during read
-                     if not self.serial_port or not self.serial_port.is_open:
-                          continue # Port closed between check and read, loop again
-                     line: Optional[bytes] = self.serial_port.readline()
+                with self._lock:  # Ensure port isn't closed by another thread during read
+                    if not self.serial_port or not self.serial_port.is_open:
+                        continue  # Port closed between check and read, loop again
+                    if self.config.meshcore_protocol == 'json_newline':
+                        line: Optional[bytes] = self.serial_port.readline()
+                    else:
+                        header = self.serial_port.read(3)
+                        if not header or len(header) < 3:
+                            continue
+                        start = header[0]
+                        if start not in (0x3E, 0x3C):
+                            continue
+                        length = int.from_bytes(header[1:3], 'little')
+                        payload = self.serial_port.read(length)
+                        if len(payload) < length:
+                            self.logger.warning(
+                                f"Incomplete frame: expected {length} bytes, got {len(payload)}"
+                            )
+                            continue
+                        line = header + payload
 
                 if line:
                     self.logger.debug(f"Meshcore RAW RX: {line!r}")

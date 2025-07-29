@@ -37,6 +37,7 @@ MESHCORE_BAUD_RATE = 9600
 # Built-in options:
 #   json_newline: Expects/sends newline-terminated UTF-8 encoded JSON strings.
 #                 See docs/architecture.md for the expected JSON structure.
+#   companion_frame: Binary companion-radio frames as defined in MeshCore wiki.
 # You can add custom protocols in ammb/protocol.py if needed.
 MESHCORE_PROTOCOL = json_newline
 
