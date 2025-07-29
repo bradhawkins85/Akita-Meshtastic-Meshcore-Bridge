@@ -86,5 +86,19 @@ def test_load_config_uses_defaults(tmp_path):
     assert config.meshcore_baud == int(DEFAULT_CONFIG['MESHCORE_BAUD_RATE'])
     assert config.meshcore_protocol == DEFAULT_CONFIG['MESHCORE_PROTOCOL']
 
+# New test to ensure protobuf protocol is accepted
+def test_load_config_protobuf_protocol(tmp_path):
+    """Loading a config with MESHCORE_PROTOCOL set to protobuf should succeed."""
+    config_path = tmp_path / "proto_config.ini"
+    parser = configparser.ConfigParser()
+    parser['DEFAULT'] = DEFAULT_CONFIG.copy()
+    parser['DEFAULT']['MESHCORE_PROTOCOL'] = 'protobuf'
+    with open(config_path, 'w') as f:
+        parser.write(f)
+
+    config = load_config(str(config_path))
+    assert config is not None
+    assert config.meshcore_protocol == 'protobuf'
+
 # Add more tests for edge cases, different invalid values, etc.
 
