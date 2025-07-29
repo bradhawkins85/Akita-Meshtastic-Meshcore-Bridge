@@ -33,7 +33,7 @@ This bridge enables interoperability, allowing messages, sensor data (with appro
 * **Direct Serial MeshCore Connection:** Interfaces directly with MeshCore nodes via standard RS-232/USB serial ports, avoiding the need for intermediate network gateways in the base case.
 * **~~Reliable~~ Meshtastic Integration:** Leverages the official `meshtastic-python` library, utilizing its asynchronous callback mechanism (`pubsub`) for efficient message reception.
 * **Modular & Extensible Design:** Built with separate handlers for each network type (`MeshtasticHandler`, `MeshcoreHandler`) and protocol (`protocol.py`), making it easier to understand, maintain, and extend.
-* **Configurable Meshcore Protocol:** Supports different serial communication protocols for MeshCore via the `config.ini` file. Built-in handlers include newline-terminated JSON (`json_newline`) and a protobuf option for binary messages.
+* **Configurable Meshcore Protocol:** Supports different serial communication protocols for MeshCore via the `config.ini` file. Includes a default handler for newline-terminated JSON (`json_newline`), which can be adapted or replaced.
 * **Robust Connection Management:** Automatically attempts to reconnect to Meshtastic and MeshCore devices if the serial connection is lost during operation.
 * **Graceful Shutdown:** Handles `Ctrl+C` (SIGINT) to cleanly shut down threads, close connections, and exit.
 * **Clear Configuration:** Uses a simple `config.ini` file for all settings (ports, baud rates, node IDs, logging levels, protocol selection).
@@ -112,7 +112,7 @@ The bridge requires a `config.ini` file in the project's root directory.
     Open the newly created `config.ini` file in a text editor and adjust the settings according to your hardware setup:
     * `MESHCORE_SERIAL_PORT`: Set the correct serial port for your MeshCore device (e.g., `/dev/ttyS0`, `COM4`).
     * `MESHCORE_BAUD_RATE`: **Crucially, set this to match the baud rate configured on your MeshCore device.** (e.g., `9600`, `115200`).
-    * `MESHCORE_PROTOCOL`: Select the protocol handler matching how your MeshCore device communicates. Available options are `json_newline` (default) and `protobuf`.
+    * `MESHCORE_PROTOCOL`: Select the protocol handler matching how your MeshCore device communicates. `json_newline` is the default. See `docs/architecture.md` for the expected JSON structure if using the default.
     * `BRIDGE_NODE_ID`: **Recommended:** Set this to the actual Meshtastic Node ID (e.g., `!a1b2c3d4`) of the device running the bridge to prevent message loops. Use `meshtastic --info` to find your ID.
     * `LOG_LEVEL`: Adjust logging verbosity (`DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`). `INFO` is a good starting point.
 
@@ -182,7 +182,7 @@ Contributions, bug reports, and feature requests are welcome! Please follow thes
 
 ## Disclaimer
 
-**Protocol Compatibility:** This bridge's ability to communicate with a MeshCore device fundamentally depends on the serial protocol used by that device. The bridge provides a framework with built-in `json_newline` and `protobuf` handlers. **You MUST verify that your MeshCore device's serial communication format matches the selected `MESHCORE_PROTOCOL` handler.** If it doesn't, you will need to adapt the existing protocol handler or create a new one in `ammb/protocol.py`.
+**Protocol Compatibility:** This bridge's ability to communicate with a MeshCore device fundamentally depends on the serial protocol used by that device. The bridge provides a framework and a default implementation (`json_newline`) assuming specific newline-terminated JSON structures (detailed in `docs/architecture.md`). **You MUST verify that your MeshCore device's serial communication format matches the selected `MESHCORE_PROTOCOL` handler.** If it doesn't, you will need to adapt the existing protocol handler or create a new one in `ammb/protocol.py`.
 
 **"As Is":** This software is provided "as is", without warranty of any kind. Use it at your own risk. Ensure you understand its operation and limitations before deploying it in critical scenarios.
 
