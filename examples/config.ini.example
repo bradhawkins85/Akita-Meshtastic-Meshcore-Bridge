@@ -38,6 +38,7 @@ MESHCORE_BAUD_RATE = 9600
 #   json_newline: Expects/sends newline-terminated UTF-8 encoded JSON strings.
 #                 See docs/architecture.md for the expected JSON structure.
 # You can add custom protocols in ammb/protocol.py if needed.
+# Options: json_newline, protobuf
 MESHCORE_PROTOCOL = json_newline
 
 # Conceptual Network ID for Meshcore (optional).

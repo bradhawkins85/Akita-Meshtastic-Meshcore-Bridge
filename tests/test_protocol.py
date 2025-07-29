@@ -7,7 +7,13 @@ import pytest
 import json
 
 # Module to test
-from ammb.protocol import get_protocol_handler, JsonNewlineProtocol, MeshcoreProtocolHandler
+from ammb.protocol import (
+    get_protocol_handler,
+    JsonNewlineProtocol,
+    MeshcoreProtocolHandler,
+    ProtobufProtocol,
+)
+from ammb.protos import meshcore_pb2
 
 # --- Test JsonNewlineProtocol ---
 
@@ -15,6 +21,12 @@ from ammb.protocol import get_protocol_handler, JsonNewlineProtocol, MeshcorePro
 def json_handler() -> JsonNewlineProtocol:
     """Provides an instance of the JsonNewlineProtocol handler."""
     return JsonNewlineProtocol()
+
+
+@pytest.fixture
+def protobuf_handler() -> ProtobufProtocol:
+    """Provides an instance of the ProtobufProtocol handler."""
+    return ProtobufProtocol()
 
 # Parameterize test data for encoding
 encode_test_data = [
@@ -79,6 +91,29 @@ def test_get_protocol_handler_unsupported():
     """Test getting an unknown protocol handler raises ValueError."""
     with pytest.raises(ValueError):
         get_protocol_handler('unknown_protocol')
+
+
+# --- Test ProtobufProtocol ---
+
+def test_protobuf_encode_decode_roundtrip(protobuf_handler: ProtobufProtocol):
+    """Ensure encoding then decoding with protobuf returns original values."""
+    original = {
+        "destination_meshtastic_id": "!abcd",
+        "payload": "hello",
+        "channel_index": 1,
+        "want_ack": True,
+    }
+    encoded = protobuf_handler.encode(original)
+    assert isinstance(encoded, bytes)
+    decoded = protobuf_handler.decode(encoded)
+    # protobuf MessageToDict returns strings for bools/ints sometimes depending
+    # on version, cast to match
+    assert decoded == {
+        "destination_meshtastic_id": "!abcd",
+        "payload": "hello",
+        "channel_index": 1,
+        "want_ack": True,
+    }
 
 # Add tests for other protocol handlers (e.g., PlainTextProtocol) when implemented.
 

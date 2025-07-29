@@ -42,6 +42,7 @@ All settings are currently placed under the `[DEFAULT]` section.
     * **Description:** Specifies how messages are formatted when sent and received over the MeshCore serial connection.
     * **Supported Values:**
         * `json_newline`: Messages are expected to be single lines of UTF-8 encoded JSON text, terminated by a newline character (`\n`). This is the default and recommended protocol for structured data exchange. See `docs/architecture.md` for the expected JSON structure.
+        * `protobuf`: Messages are newline-delimited binary protobuf using the `MeshcoreMessage` schema.
         * *(Future protocols like `plain_text` could be added)*
     * **Default:** `json_newline`
     * **Required:** Yes (effectively, as the default is used if missing)
