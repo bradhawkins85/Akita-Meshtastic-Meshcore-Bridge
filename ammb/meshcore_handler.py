@@ -247,7 +247,18 @@ class MeshcoreHandler:
                             except Queue.Full:
                                 self.logger.warning("Meshtastic send queue is full. Dropping incoming message from Meshcore.")
                         else:
-                            self.logger.warning(f"Meshcore RX: Decoded message lacks required fields ('destination_meshtastic_id' or 'payload'/'payload_json'): {meshcore_msg}")
+                            if self.config.meshcore_protocol == 'companion_frame':
+                                # Frames like status updates or acknowledgements
+                                # are not forwarded to Meshtastic. Log at debug
+                                # level instead of warning.
+                                self.logger.debug(
+                                    f"Meshcore RX: Ignoring non-forwardable frame: {meshcore_msg}"
+                                )
+                            else:
+                                self.logger.warning(
+                                    "Meshcore RX: Decoded message lacks required fields ('destination_meshtastic_id' or 'payload'/'payload_json'): %s",
+                                    meshcore_msg,
+                                )
                     # else: message was decoded as None (e.g., empty line, parse error) - already logged by decoder
 
                 # else: readline timed out (no data received), this is normal
