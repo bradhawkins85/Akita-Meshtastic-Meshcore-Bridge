@@ -43,11 +43,7 @@ DEFAULT_CONFIG = {
 
 # Valid options for settings requiring specific choices
 VALID_LOG_LEVELS = {'CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'}
-# Supported protocol handlers for the Meshcore serial connection
-VALID_MESHCORE_PROTOCOLS = {
-    'json_newline',  # newline terminated JSON messages
-    'protobuf',      # newline delimited protobuf messages
-}  # Add more as they are implemented
+VALID_MESHCORE_PROTOCOLS = {'json_newline'} # Add more as they are implemented
 
 # --- Functions ---
 def load_config(config_path: str = CONFIG_FILE) -> Optional[BridgeConfig]:

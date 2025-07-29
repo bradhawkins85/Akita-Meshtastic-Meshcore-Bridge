@@ -86,9 +86,6 @@ def test_get_protocol_handler_success():
     # Test case insensitivity
     handler_upper = get_protocol_handler('JSON_NEWLINE')
     assert isinstance(handler_upper, JsonNewlineProtocol)
-    # Protobuf handler should also be available
-    proto_handler = get_protocol_handler('protobuf')
-    assert isinstance(proto_handler, ProtobufProtocol)
 
 def test_get_protocol_handler_unsupported():
     """Test getting an unknown protocol handler raises ValueError."""
