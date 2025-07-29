@@ -11,6 +11,10 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Dict, Optional, Any
 
+from google.protobuf.json_format import MessageToDict
+
+from .protos import meshcore_pb2
+
 # --- Base Class ---
 class MeshcoreProtocolHandler(ABC):
     """
@@ -104,11 +108,52 @@ class JsonNewlineProtocol(MeshcoreProtocolHandler):
             self.logger.error(f"Error decoding Meshcore data: {e} - Raw line: {line!r}", exc_info=True)
             return None
 
+
+class ProtobufProtocol(MeshcoreProtocolHandler):
+    """Handles newline-delimited protobuf messages."""
+
+    def encode(self, data: Dict[str, Any]) -> Optional[bytes]:
+        """Encode a dictionary into the MeshcoreMessage protobuf format."""
+        try:
+            msg = meshcore_pb2.MeshcoreMessage()
+            if "destination_meshtastic_id" in data:
+                msg.destination_meshtastic_id = str(data["destination_meshtastic_id"])
+            if "payload" in data:
+                msg.payload = str(data["payload"])
+            if "channel_index" in data:
+                msg.channel_index = int(data["channel_index"])
+            if "want_ack" in data:
+                msg.want_ack = bool(data["want_ack"])
+
+            serialized = msg.SerializeToString() + b"\n"
+            self.logger.debug(f"Encoded protobuf: {serialized!r}")
+            return serialized
+        except Exception as e:
+            self.logger.error(f"Protobuf encode error: {e}", exc_info=True)
+            return None
+
+    def decode(self, line: bytes) -> Optional[Dict[str, Any]]:
+        """Decode a line of bytes into a dictionary using protobuf."""
+        data = line.rstrip(b"\r\n")
+        if not data:
+            self.logger.debug("Ignoring empty protobuf line.")
+            return None
+        try:
+            msg = meshcore_pb2.MeshcoreMessage()
+            msg.ParseFromString(data)
+            decoded = MessageToDict(msg, preserving_proto_field_name=True)
+            self.logger.debug(f"Decoded protobuf: {decoded}")
+            return decoded
+        except Exception as e:
+            self.logger.error(f"Protobuf decode error: {e}", exc_info=True)
+            return None
+
 # --- Factory Function ---
 
 # Store registered protocol handlers
 _protocol_handlers = {
     'json_newline': JsonNewlineProtocol,
+    'protobuf': ProtobufProtocol,
     # Add other protocol handlers here as they are created
     # 'plain_text': PlainTextProtocol,
 }
